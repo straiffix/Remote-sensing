@@ -15,17 +15,17 @@ train_gen = ImageDataGenerator(
         horizontal_flip=True,
         fill_mode='nearest')
 
-img = load_img('dataset/training_data/4.png')
+img = load_img('dataset/patterns/houses_13.png')
 x = img_to_array(img)
 x = x.reshape((1,) + x.shape) 
 
 i = 0
-for batch in train_gen.flow(x, batch_size=1, save_to_dir='preview', save_prefix='crossroad', save_format='jpeg'):
+for batch in train_gen.flow(x, batch_size=1, save_to_dir='dataset/preview', save_prefix='houses', save_format='jpeg'):
     i +=1
     if i > 20:
         break 
     
-file = '1.png'
+"""file = '1.png'
 cpsize = 150;
 imgg = Image.open(file)
 width, height = imgg.size
@@ -35,7 +35,7 @@ for i in range(0, width):
         box = (i, j, i + cpsize if i + cpsize < width else width - 1, j + cpsize if j + cpsize < height else
                height - 1 )
         print('%s %s' % (file, box))
-        imgg.crop(box).save('dataset/test_data/zc.%s.x%03d.y%03d.jpg' % (file.replace('.png', ''), i, j))
+        imgg.crop(box).save('dataset/test_data/zc.%s.x%03d.y%03d.jpg' % (file.replace('.png', ''), i, j))"""
 
 
 '''imgg = Image.open(file)

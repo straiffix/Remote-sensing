@@ -5,6 +5,9 @@ Created on Fri Apr 26 12:53:52 2019
 @author: strai
 """
 
+from matplotlib import pyplot as plt
+from keras.preprocessing import image
+from keras import models
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense
@@ -14,6 +17,7 @@ from PIL import Image
 import numpy as np
 from keras import optimizers
 from skimage import transform
+import cv2
 
 
 def load(filename):
@@ -36,7 +40,6 @@ loaded_model_json = json_file.read()
 json_file.close()
 loaded_model = model_from_json(loaded_model_json)  
 loaded_model.load_weights("model.h5")
-image = load('dataset/1/5.png')
 
 #sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 #loaded_model.compile(loss='mean_squared_error', optimizer=sgd)
@@ -48,22 +51,50 @@ test_file = 'dataset/2800m_2.png'
 cpsize = 120
 test_image = Image.open(test_file)
 #width, height = test_image.size
-width = 200
-height = 200
-
 box = (0, 0, 120, 120)
-sample = test_image.crop(box)
-sample1 = preprocess(sample)
-print(loaded_model.predict(sample1))
-sample1 = np.multiply(sample1, loaded_model.get_weights())
+width = test_image.size[0]
+height = test_image.size[1]
+sample2 = test_image.crop(box)
 
+result = Image.new('RGBA', (width, height))
 
-"""for x1 in range(0, width, 10):
-    for y1 in range(0, height, 10):
-        box = (x1, y1, x1+cpsize if x1+cpsize < width else width - 1,
-               y1+cpsize if y1+cpsize < height else height - 1)
-        sample = test_image.crop(box)
-        sample.show()
-        sample = preprocess(sample)
+for x in range(0, width, cpsize):
+    for y in range(0, height, cpsize):
+        if x+cpsize < width:
+            x2 = x + cpsize
+        else:
+            break
+        if y + cpsize < height:
+            y2 = y + cpsize
+        else:
+            break
         
-        print(loaded_model.predict(sample))"""
+        box = (x, y, x2, y2)
+        sample = test_image.crop(box)
+        img = sample
+        img_tensor = image.img_to_array(img)
+        img_tensor = np.expand_dims(img_tensor, axis=0)
+        img_tensor /= 255.
+       
+        layer_outputs = [layer.output for layer in loaded_model.layers[:16]] 
+# Extracts the outputs of the top 12 layers
+        activation_model = models.Model(inputs=loaded_model.input, outputs=layer_outputs) # Creates a model that will return these outputs, given the model input
+        activations = activation_model.predict(img_tensor) 
+
+        layer_names = []
+        for layer in loaded_model.layers[:16]:
+            layer_names.append(layer.name) # Names of the layers, so you can have them as part of your plot
+        lactiv = activations[4]
+        channel_image = lactiv[0, :, :, 5]
+        channel_image -= channel_image.mean() # Post-processes the feature to make it visually palatable
+        channel_image /= channel_image.std()
+        channel_image *= 64
+        channel_image += 128
+        channel_image = np.clip(channel_image, 0, 255).astype('uint8')
+        plt.imsave('ci.png', channel_image, cmap='inferno' )
+        ci = Image.open('ci.png')
+        ci = ci.resize((120, 120))
+        result.paste(ci, (x, y))
+        ci.close()
+plt.imshow(result )
+plt.imsave('result.png', result)
