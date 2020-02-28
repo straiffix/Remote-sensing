@@ -13,5 +13,5 @@ of CNN implemented in Keras.
 
 **Result**
 - In the end whole image is coloured by the colours of each subject. 
-[Image](https://imgur.com/vm2HES2)]
-[Image](https://imgur.com/ROTwcUs)]
+[Image](https://imgur.com/vm2HES2)
+[Image](https://imgur.com/ROTwcUs)
