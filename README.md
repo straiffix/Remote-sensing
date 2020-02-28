@@ -5,7 +5,7 @@ of CNN implemented in Keras.
 **Data**
 - Dataset consists of manually extracted satellite images with same resolutions. 
 - Example of image:
-[Image](https://imgur.com/WtrOK47)
+[Image](/530m_2_copy.png)
 - From the images have benn extracted 8 types of objects: cars, crosswalks, separate trees, forests, houses, roads, swimming pools, and samples of lands. 
 - Each sample has been preprocessed, from each sample script has created a large amount of different samples. 
 - Example of processing:
